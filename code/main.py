@@ -44,7 +44,6 @@ def train(model, user_events, user_info):
             print('Batch {} loss {}'.format(batch // model.batch_size, loss))
 
 
-
 def test(model, user_events, user_info):
     user_ids = user_events.keys()
     loss = []
@@ -81,8 +80,8 @@ def main():
     user_ids = np.array(user_ids)
 
     # Train/Test split
-    train_user_ids = user_ids[:int(len(user_ids)*.85)]
-    test_user_ids = user_ids[int(len(user_ids)*.85):]
+    train_user_ids = user_ids[:int(len(user_ids) * .85)]
+    test_user_ids = user_ids[int(len(user_ids) * .85):]
 
     train_user_events = {}
     train_user_info = {}
@@ -96,7 +95,6 @@ def main():
         test_user_events[user_id] = user_events[user_id]
         test_user_info[user_id] = user_info_dict[user_id]
 
-
     model = Model()
     epochs = 5
     for epoch in epochs:
@@ -104,7 +102,6 @@ def main():
         loss = test(model, test_user_events, test_user_info)
 
         print('Loss after epoch {} = {}'.format(epoch, loss))
-        
 
 
 if __name__ == '__main__':
