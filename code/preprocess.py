@@ -19,14 +19,6 @@ def preprocess(data_file, user_data_file):
 	:return: user events dictionary, user info dictionary, artist id dictionary, track id dictionary,
 	country id dictionary
 	"""
-	
-	with open(data_file) as f:
-		# user id, timestamp, artist id, artist name, track id, track name
-		data = np.genfromtxt(f, delimiter='\t', dtype='U') # Specifying unicode string stype
-
-	with open(user_data_file) as f:
-		user_data = np.genfromtxt(f, delimiter='\t', dtype='U')
-
 	# A dictionary where the keys are user ids and the values are np.arrays of timestamp, seconds since first song
 	# artist id, artist name, track id, track name
 	user_events = {}
@@ -34,43 +26,54 @@ def preprocess(data_file, user_data_file):
 	artist_id_acc = 0
 	track_ids = {} # maps track ids to ints
 	track_id_acc = 0
+	
+	with open(data_file) as f:
+		# Iterate through the lines in the TSV file
+		for i in range(20):
+			line = f.readline() # for line in reversed(f):
+			event = np.array(line.replace('\n', '').rsplit('\t'))
+			# array of user id, timestamp, artist id, artist name, track id, track name
 
-	# Create user events dictionary
-	for event in data:
-		# Update artist id dictionary
-		if event[4] not in artist_ids.keys():
-			artist_ids[event[5]] = artist_id_acc
-			artist_id_acc += 1
-		artist_id = track_ids[event[5]]
+			# Convert string of timestamp to Datetime object
+			timestamp = datetime.strptime(event[1], '%Y-%m-%dT%H:%M:%SZ')  # Timestamp schema = %Y-%m-%dT%H:%M:%SZ
 
-		# Update track id dictionary
-		if event[5] not in track_ids.keys():
-			track_ids[event[5]] = track_id_acc
-			track_id_acc += 1
-		track_id = track_ids[event[5]]
+			# Update artist id dictionary
+			if event[3] not in artist_ids.keys():
+				artist_ids[event[3]] = artist_id_acc
+				artist_id_acc += 1
+			artist_id = artist_ids[event[3]]
 
-		timestamp = datetime.strptime(event[1], '%Y-%m-%dT%H:%M:%SZ')  # Timestamp schema = %Y-%m-%dT%H:%M:%SZ
+			# Update track id dictionary
+			if event[5] not in track_ids.keys():
+				track_ids[event[5]] = track_id_acc
+				track_id_acc += 1
+			track_id = track_ids[event[5]]
 
-		# Add new event to the dictionary
-		if event[0] not in user_events.keys(): # check if listener exists in events dictionary
-			#Value schema = timestamp, seconds since first timestamp, artist id, track id
-			values = np.array([timestamp, 0, artist_id, track_id])
-			user_events[event[0]] = [values]
-		else:
-			last_listen = user_events[event[0]][0] # timestamp of last listen
-			secs_since_last_listen = (timestamp-last_listen).total_seconds()
+			# Add new event to the dictionary, appending to existing users
+			if event[0] not in user_events.keys():  # check if listener exists in events dictionary
+				# Value schema = timestamp, seconds since first timestamp, artist id, track id
+				values = np.array([timestamp, 0, artist_id, track_id])
+				user_events[event[0]] = [values]
+			else:
+				last_listen = user_events[event[0]][-1][0]  # timestamp of last listen
+				secs_since_last_listen = (timestamp - last_listen).total_seconds()
 
-			values = np.array([timestamp, secs_since_last_listen, artist_id, track_id])
-			user_events[event[0]].append(values)
+				values = np.array([timestamp, secs_since_last_listen, artist_id, track_id])
+				user_events[event[0]].append(values)
 
-		user_info_dict = {}
-		for user in user_data:
+
+	user_info_dict = {} # A dictionary that mamps user id to user info
+	with open(user_data_file) as f:
+		f.readline() # read header line
+		for i in range(20):
+			line = f.readline()
+			user = np.array(line.replace('\n', '').rsplit('\t'))
 			# Map gender
 			if user[1] == 'f':
 				gender = 0
 			elif user[1] == 'm':
 				gender = 1
-			else: # Empty
+			else:  # Empty
 				gender = 2
 
 			# Map age
