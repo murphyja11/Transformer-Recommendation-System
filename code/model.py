@@ -7,13 +7,12 @@ class Model():
         # Hyperparameters
         self.batch_size = None
         self.learning_rate = .001
-        self.optimizer = tf.keras.optimizers.Adam(learning_rate=self.learning_rate)
 
         # Parameters
 
 
     @tf.function
-    def call(self, inputs, decoder_input):
+    def call(self, events, user_info):
 
         pass
 

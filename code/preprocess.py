@@ -16,7 +16,7 @@ def preprocess(data_file, user_data_file):
 
 	:param data_file: filepath to events data file
 	:param user_data_file: filepath to user info data file
-	:return: user events dictionary, user info dictionary, artist id dictionary, track id dictionary,
+	:return: user events dictionary, user info dictionary, user id set, artist id dictionary, track id dictionary,
 	country id dictionary
 	"""
 	# A dictionary where the keys are user ids and the values are np.arrays of timestamp, seconds since first song
@@ -66,7 +66,7 @@ def preprocess(data_file, user_data_file):
 	with open(user_data_file) as f:
 		f.readline() # read header line
 		for i in range(20):
-			line = f.readline()
+			line = f.readline() # for line in reversed(f):
 			user = np.array(line.replace('\n', '').rsplit('\t'))
 			# Map gender
 			if user[1] == 'f':
