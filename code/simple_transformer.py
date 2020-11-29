@@ -1,9 +1,9 @@
-import numpy as np
 import tensorflow as tf
+import numpy as np
 from transformer_funcs import *
 
 
-class Transformer():
+class Simple_Transformer:
     def __init__(self):
         # Hyperparameters
         self.batch_size = 250
@@ -17,15 +17,9 @@ class Transformer():
         # Positional Encoding Layer
         self.positional_enc = Positional_Encoding_Layer(self.window_size, self.event_emb_size)
 
-        # Encoders
+        # Single Encoder
         self.encoder1 = Transformer_Block(self.event_emb_size, False)
-        self.encoder2 = Transformer_Block(self.event_emb_size, False)
-        self.encoder3 = Transformer_Block(self.event_emb_size, False)
-
-        # Decoders
-        self.decoder1 = Transformer_Block(self.event_emb_size, True)
-        self.decoder2 = Transformer_Block(self.event_emb_size, True)
-        self.decoder3 = Transformer_Block(self.event_emb_size, True)
+        # Can add more here potentially!!!
 
         # Dense Layers
         self.dense1_size = 250
@@ -37,22 +31,20 @@ class Transformer():
     @tf.function
     def call(self, inputs):
         """
-        Computes the models transformers forward pass using the input sequence data
+        Computes the forward pass of the model
 
-        :param inputs: users listening history (batch size, window size)
-        :return: predicted songs at each time step (batch size, window size)
+        :param inputs: a tensor of shape (batch size, window size)
+        :return: a tensor of shape (batch size, window size, num songs)
         """
-        embeddings = self.event_emb(inputs)
-        embeddings = self.positional_enc(embeddings)
+        # Embedding layers
+        embedding = self.event_emb(inputs)
+        embedding = self.positional_enc(embedding)
 
-        encoded = self.encoder1(embeddings)
-        encoded = self.encoder2(encoded)
-        encoded = self.encoded3(encoded)
+        # Transformer layer(s)
+        output = self.encoder1(embedding)
 
-        decoded = self.decoder(encoded)  # TODO: Removed Context?
-        # TODO: call Decoder 2 and 3
-
-        output = self.dense1(decoded)
+        # Dense layers
+        output = self.dense1(output)
         output = self.dense2(output)
         probs = self.dense3(output)
 
@@ -74,6 +66,14 @@ class Transformer():
         return tf.reduce_sum(loss)
 
     def accuracy(self, probs, labels, mask):
+        """
+        Computes the accuracy of the model over a given batch of data
+
+        :param probs: probabilities produced by the forward pass
+        :param labels: the correct labels
+        :param mask: a mask to prevent the model from looking ahead
+        :return: the accuracy a 1d tensor
+        """
 
         predictions = tf.argmax(input=probs, axis=2)
         accuracy = tf.cast(tf.equal(predictions, labels), dtype=tf.float32)
