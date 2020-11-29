@@ -41,17 +41,17 @@ class Transformer_Block(tf.keras.layers.Layer):
         attention_norm = self.layer_norm(attention_out)
 
         if self.is_decoder:
-            assert context is not None
             # Encoder-Decoder Attention
-            context_attention_out = self.context_attention(context, context, attention_norm)
+            context_attention_out = self.context_attention(inputs, inputs, attention_norm) # TODO: << why attention_norm here?
             context_attention_out += attention_norm
             attention_norm = self.layer_norm(context_attention_out)
 
         # Feed Forward
         output = self.dense1(attention_norm)
+        output = self.dense2(output)
         output += attention_norm
         output = self.layer_norm(output)
-        output = tf.nn.relu(output)
+        # output = tf.nn.relu(output)
 
         return output
 

@@ -2,6 +2,7 @@ import numpy as np
 import tensorflow as tf
 from transformer_funcs import *
 
+
 class Transformer():
     def __init__(self):
         # Hyperparameters
@@ -33,7 +34,6 @@ class Transformer():
         self.dense2 = tf.keras.layers.Dense(self.dense2_size, activation='relu')
         self.dense3 = tf.keras.layers.Dense(self.num_songs, acitvation='softmax')
 
-
     @tf.function
     def call(self, inputs):
         """
@@ -49,15 +49,14 @@ class Transformer():
         encoded = self.encoder2(encoded)
         encoded = self.encoded3(encoded)
 
-        decoded = self.decoder(encoded, context=encoded) # TODO: <<<<WRONG
-        #TODO: call Decoder 2 and 3
+        decoded = self.decoder(encoded)  # TODO: Removed Context?
+        # TODO: call Decoder 2 and 3
 
         output = self.dense1(decoded)
         output = self.dense2(output)
         probs = self.dense3(output)
 
         return probs
-
 
     def loss(self, probs, labels, mask):
         """
@@ -73,3 +72,6 @@ class Transformer():
         loss = tf.boolean_mask(loss, mask)
 
         return tf.reduce_sum(loss)
+
+    def accuracy(self, probs, labels, mask):
+        pass
