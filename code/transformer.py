@@ -16,9 +16,15 @@ class Transformer():
         # Positional Encoding Layer
         self.positional_enc = Positional_Encoding_Layer(self.window_size, self.event_emb_size)
 
-        # Encoder and Decoder
-        self.encoder = Transformer_Block(self.event_emb_size, False)
-        self.decoder = Transformer_Block(self.event_emb_size, True)
+        # Encoders
+        self.encoder1 = Transformer_Block(self.event_emb_size, False)
+        self.encoder2 = Transformer_Block(self.event_emb_size, False)
+        self.encoder3 = Transformer_Block(self.event_emb_size, False)
+
+        # Decoders
+        self.decoder1 = Transformer_Block(self.event_emb_size, True)
+        self.decoder2 = Transformer_Block(self.event_emb_size, True)
+        self.decoder3 = Transformer_Block(self.event_emb_size, True)
 
         # Dense Layers
         self.dense1_size = 250
@@ -39,8 +45,12 @@ class Transformer():
         embeddings = self.event_emb(inputs)
         embeddings = self.positional_enc(embeddings)
 
-        encoded = self.encoder(embeddings)
+        encoded = self.encoder1(embeddings)
+        encoded = self.encoder2(encoded)
+        encoded = self.encoded3(encoded)
+
         decoded = self.decoder(encoded, context=encoded) # TODO: <<<<WRONG
+        #TODO: call Decoder 2 and 3
 
         output = self.dense1(decoded)
         output = self.dense2(output)
