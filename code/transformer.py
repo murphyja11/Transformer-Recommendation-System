@@ -74,4 +74,9 @@ class Transformer():
         return tf.reduce_sum(loss)
 
     def accuracy(self, probs, labels, mask):
-        pass
+
+        predictions = tf.argmax(input=probs, axis=2)
+        accuracy = tf.cast(tf.equal(predictions, labels), dtype=tf.float32)
+        accuracy = tf.reduce_mean(tf.boolean_mask(accuracy, mask))
+
+        return accuracy
