@@ -3,10 +3,13 @@ import tensorflow as tf
 
 
 class Model():
-    def __init__(self):
+    def __init__(self, num_songs):
         # Hyperparameters
         self.batch_size = None
         self.learning_rate = .001
+
+        # Candidate Generation Loss function
+        self.candgen_loss = tf.keras.losses.CosineSimilarity()
 
         # Embedding Layers
         self.event_emb_size = 50
@@ -16,11 +19,12 @@ class Model():
 
         # Candidate Generation Dense Layers
         self.dense1_output = 100
-        self.dense2_output = 100
+        self.dense2_output = num_songs
         self.dense1 = tf.keras.layers.Dense(self.dense1_output, activation='relu')
-        self.dense2 = tf.keras.layers.Dense(self.dense1_output, activation='relu')
+        self.dense2 = tf.keras.layers.Dense(self.dense2_output)
 
         # Ranking Transformer Layers
+        
 
 
     @tf.function
@@ -41,7 +45,8 @@ class Model():
 
         # Now feed embedded and concatenated events to dense layers for Candidate Generation
         output = self.dense1(inputs)
-        output = self.dense2(output)
+        output = self.dense2(output) # outputs logits, one per song (so it will probably be a ton of songs)
+        output
 
         # Now perform ranking using the Transformer layer
 

@@ -3,7 +3,7 @@ from model import *
 import random
 
 
-def train(model, user_events, user_info):
+def train(model, user_events, user_info, songs):
     """
     This function trains the model for one epoch
 
@@ -74,7 +74,7 @@ def test(model, user_events, user_info):
 def main():
     data_filepath = '../data/userid-timestamp-artid-artname-traid-traname.tsv'
     user_data_filepath = '../data/userid-profile.tsv'
-    user_events, user_info_dict, artist_ids, track_ids, country_dict = preprocess(data_filepath, user_data_filepath)
+    user_events, user_info_dict, num_songs, artist_ids, track_ids, country_dict = preprocess(data_filepath, user_data_filepath)
     user_ids = user_events.keys()
     random.shuffle(user_ids)
     user_ids = np.array(user_ids)
@@ -95,10 +95,10 @@ def main():
         test_user_events[user_id] = user_events[user_id]
         test_user_info[user_id] = user_info_dict[user_id]
 
-    model = Model()
+    model = Model(num_songs)
     epochs = 5
     for epoch in epochs:
-        train(model, train_user_events, train_user_info)
+        train(model, train_user_events, train_user_info, songs)
         loss = test(model, test_user_events, test_user_info)
 
         print('Loss after epoch {} = {}'.format(epoch, loss))

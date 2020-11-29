@@ -26,6 +26,7 @@ def preprocess(data_file, user_data_file):
 	artist_id_acc = 0
 	track_ids = {} # maps track ids to ints
 	track_id_acc = 0
+	num_songs = 0
 	
 	with open(data_file) as f:
 		# Iterate through the lines in the TSV file
@@ -48,6 +49,8 @@ def preprocess(data_file, user_data_file):
 				track_ids[event[5]] = track_id_acc
 				track_id_acc += 1
 			track_id = track_ids[event[5]]
+
+			num_songs += 1
 
 			# Add new event to the dictionary, appending to existing users
 			if event[0] not in user_events.keys():  # check if listener exists in events dictionary
@@ -92,5 +95,4 @@ def preprocess(data_file, user_data_file):
 
 			user_info_dict[user[0]] = np.array([gender, age, country])
 
-
-	return user_events, user_info_dict, artist_ids, track_ids, country_dict
+	return user_events, user_info_dict, num_songs, artist_ids, track_ids, country_dict
